@@ -1,5 +1,4 @@
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
-import bgimg from './mountains.jpeg';
 
 const thm = createTheme({
   palette: {
