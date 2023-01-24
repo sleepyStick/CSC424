@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import { useAuth } from "./context/AuthProvider";
-import { Button, Grid, TextField } from '@mui/material';
+import { Button, Grid, TextField, Typography } from '@mui/material';
 
 export const Register = () => {
   const { value } = useAuth();
   const [username, setUsername] = React.useState(null);
   const [password, setPassword] = React.useState(null);
   const [validatePassword, setValidatePassword] = React.useState(null);
+  const [error, setError] = React.useState(null);
 
 
   return (
@@ -26,6 +27,18 @@ export const Register = () => {
           borderRadius: 2,
           width: '30%',
         }}>
+        { (value.token == null && error)?
+          <Grid item xs={12}>
+            <Typography
+              style={{
+                color: 'red'
+              }}
+            >
+              Either an error occurred or your password is insecure. Please try again.
+            </Typography>
+          </Grid>
+          : null
+        }
         <Grid item xs={12}>
           <TextField
             type="text"
@@ -35,8 +48,8 @@ export const Register = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             sx={{
-              width: '90%',
-              mb: '2%',
+              width: '95%',
+              mb: '1%',
               mt: '2%'
             }}
             InputProps={{ inputProps: { style: { color: '#000000' }}}}
@@ -51,8 +64,8 @@ export const Register = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             sx={{
-              width: '90%',
-              mb: '2%'
+              width: '95%',
+              mb: '1%'
             }}
             InputProps={{ inputProps: { style: { color: '#000000' }}}}
           />
@@ -66,8 +79,8 @@ export const Register = () => {
             value={validatePassword}
             onChange={(e) => setValidatePassword(e.target.value)}
             sx={{
-              width: '90%',
-              mb: '2%'
+              width: '95%',
+              mb: '1%'
             }}
             InputProps={{ inputProps: { style: { color: '#000000' }}}}
           />
@@ -76,7 +89,7 @@ export const Register = () => {
           <Button
             variant="contained"
             color="secondary"
-            onClick={() => {value.onRegister(username, password, validatePassword)}}
+            onClick={() => {value.onRegister(username, password, validatePassword); setError(true)}}
             sx={{
               width: '35%',
               mb: '3%'
