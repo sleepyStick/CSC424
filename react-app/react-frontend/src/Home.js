@@ -56,7 +56,7 @@ export const Home = () => {
         </Grid>
         <Grid item xs={12}>
           <TextField
-            type="text"
+            type="password"
             name="password"
             label="password"
             color="secondary"
