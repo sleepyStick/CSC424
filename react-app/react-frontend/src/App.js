@@ -1,5 +1,5 @@
 import { Routes, Route, NavLink } from "react-router-dom";
-import React, { useState } from "react";
+import React from "react";
 import { Button, Grid } from '@mui/material';
 import { ProtectedRoute } from "./utils/ProtectedRoute";
 import { useAuth } from "./context/AuthProvider";
@@ -7,7 +7,6 @@ import { AuthProvider } from "./context/AuthProvider";
 import { Home } from "./Home";
 import { Register } from "./Register";
 import { Landing } from "./Landing";
-import background from "./img/mountains.jpeg";
 
 export const AuthContext = React.createContext(null);
 
@@ -50,6 +49,7 @@ const App = () => {
 const Navigation = () => {
   const { value } = useAuth();
   return (
+    <header>
     <Grid
       container
       direction="row"
@@ -58,16 +58,34 @@ const Navigation = () => {
       sx={{
         bgcolor: "primary.main",
         opacity: '95%',
+        paddingRight: '2%',
+        paddingLeft: '2%',
       }}
     >
-      <Grid item xs={8}>
-        <nav>
-          <NavLink to="/landing" activeClassName="active">Landing</NavLink>
-          <NavLink to="/home" activeClassName="active">Home</NavLink>
-          <NavLink to="/register" activeClassName="active">Register</NavLink>
-        </nav>
+      <Grid
+        item
+        container
+        direction='row'
+        xs={8}
+        spacing={5}
+      >
+        <Grid item xs={2}>
+          <nav>
+            <NavLink to="/landing" activeClassName="active">Landing</NavLink>
+          </nav>
+        </Grid>
+        <Grid item xs={2}>
+          <nav>
+            <NavLink to="/home" activeClassName="active">Home</NavLink>
+          </nav>
+        </Grid>
+        <Grid item xs={1}>
+          <nav>
+            <NavLink to="/register" activeClassName="active">Register</NavLink>
+          </nav>
+        </Grid>
       </Grid>
-      <Grid item xs={1}>
+      <Grid item xs={2}>
         {value.token && (
           <Button
             variant="contained"
@@ -83,6 +101,7 @@ const Navigation = () => {
         )}
       </Grid>
     </Grid>
+    </header>
   )
 };
 

@@ -4,8 +4,11 @@
 react-frontend/node_modules
 react-frontend/.pnp
 react-frontend/.pnp.js
+react-frontend/package-lock.json
 expressjs-backend/node_modules
 expressjs-backend/package-lock.json
+.cert/*
+*/.env
 
 # testing
 react-frontend/coverage

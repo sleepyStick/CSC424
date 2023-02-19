@@ -1,34 +1,48 @@
 import { createContext, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fakeAuth } from "../utils/FakeAuth";
-import { register } from "../utils/Register"
+import { register } from "../utils/Register";
+import { useCookies } from "react-cookie";
+
 const AuthContext = createContext({});
 export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
+  const [cookie, setCookie, removeCookie] = useCookies();
 
-  const [token, setToken] = useState(null);
+  // const [token, setToken] = useState(
+  //   document.cookie
+  //   .split('; ')
+  //   .find((row) => row.startsWith('token='))
+  //   ?.split('=')[1]);
 
   const handleRegister = async (username, password, validatePassword) => {
     if (password === validatePassword) {
       const success = await register(username, password);
+      console.log("in handleRegister: " + success);
       if (success) {
-        navigate("/home");
+        setCookie("username", username);
+        setCookie("token", success.token);
+        navigate("/landing");
       }
     }
   };
 
   const handleLogin = async (username, password) => {
     const token = await fakeAuth(username, password);
-    setToken(token);
+    console.log(token);
+    setCookie("username", username);
+    setCookie("token", token);
     navigate("/landing");
   };
 
   const handleLogout = () => {
-    setToken(null);
+    removeCookie("username");
+    removeCookie("token");
   };
 
-  const value = {
-    token,
+  let value = {
+    username: cookie['username'],
+    token: cookie['token'],
     onLogin: handleLogin,
     onLogout: handleLogout,
     onRegister: handleRegister,

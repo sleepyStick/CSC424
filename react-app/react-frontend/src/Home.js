@@ -1,12 +1,27 @@
-import React, { useState } from "react";
-import { useAuth } from "./context/AuthProvider";
+import React from "react";
+import { Controller, useForm } from 'react-hook-form';
 import { Button, Grid, TextField, Typography } from '@mui/material';
+import { useAuth } from "./context/AuthProvider";
 
 export const Home = () => { 
   const { value } = useAuth();
-  const [username, setUsername] = React.useState(null);
-  const [password, setPassword] = React.useState(null);
-  const [error, setError] = React.useState(null);
+  const [failedLogin, setFailedLogin] = React.useState(false);
+
+  const { handleSubmit, control } = useForm();
+  const onSubmit = (values) => {
+    value.onLogin(values.username, values.password);
+    setFailedLogin(true);
+  }
+
+  const errorMessages = {
+    username: {
+      required: "username is Required",
+      pattern: ""
+    },
+    password: {
+      required: "password is Required",
+    }
+  };
 
 
   return (
@@ -26,60 +41,84 @@ export const Home = () => {
           borderRadius: 2,
           width: '30%',
         }}>
-        { (value.token == null && error)?
-          <Grid item xs={12}>
-            <Typography
-              style={{
-                color: 'red'
-              }}
-            >
-              Either an error occurred or there is an incorrect username or password. Please try again.
-            </Typography>
-          </Grid>
-          : null
-        }
+          { (value.token == null && failedLogin)?
+              <Grid item xs={12}>
+                <Typography
+                  style={{
+                    color: 'red'
+                  }}
+                >
+                  Either an error occurred or there is an incorrect username or password. Please try again.
+                </Typography>
+              </Grid>
+              : null
+            }
         <Grid item xs={12}>
-          <TextField
-            type="text"
+          <Controller
+            control={control}
             name="username"
-            label="username"
-            color="secondary"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            sx={{
-              width: '95%',
-              mb: '1%',
-              mt: '2%'
+            defaultValue=""
+            rules={{
+              required: true,
             }}
-            InputProps={{ inputProps: { style: { color: '#000000' }}}}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                type="text"
+                fullWidth
+                label="username"
+                error={error !== undefined}
+                color="secondary"
+                sx={{
+                  width: '95%',
+                  mb: '1%',
+                  mt: '2%'
+                }}
+                helperText={error ? errorMessages.username[error.type] : ""}
+                InputProps={{ inputProps: { style: { color: '#000000' }}}}
+              />
+            )}
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            type="text"
+          <Controller
+            control={control}
             name="password"
-            label="password"
-            color="secondary"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            sx={{
-              width: '95%',
-              mb: '1%'
+            defaultValue=""
+            rules={{
+              required: true,
             }}
-            InputProps={{ inputProps: { style: { color: '#000000' }}}}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                type="password"
+                fullWidth
+                label="password"
+                error={error !== undefined}
+                color="secondary"
+                sx={{
+                  width: '95%',
+                  mb: '1%',
+                  mt: '2%'
+                }}
+                helperText={error ? errorMessages.password[error.type] : ""}
+                InputProps={{ inputProps: { style: { color: '#000000' }}}}
+              />
+            )}
           />
         </Grid>
         <Grid item xs={12}>
           <Button
-            variant="contained"
             color="secondary"
-            onClick={() => {value.onLogin(username, password); setError(true)}}
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
             sx={{
               width: '35%',
               mb: '3%'
             }}
-            >
-            Sign In
+          >
+            {" "}
+            Sign In{" "}
           </Button>
         </Grid>
       </Grid>

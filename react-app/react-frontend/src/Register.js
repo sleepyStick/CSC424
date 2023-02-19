@@ -1,14 +1,28 @@
-import React, { useState } from "react";
+import React from "react";
+import { Controller, useForm } from 'react-hook-form';
 import { useAuth } from "./context/AuthProvider";
 import { Button, Grid, TextField, Typography } from '@mui/material';
 
 export const Register = () => {
   const { value } = useAuth();
-  const [username, setUsername] = React.useState(null);
-  const [password, setPassword] = React.useState(null);
-  const [validatePassword, setValidatePassword] = React.useState(null);
-  const [error, setError] = React.useState(null);
+  const [failedRegister, setFailedRegister] = React.useState(false);
 
+  const { handleSubmit, control, getValues } = useForm();
+  const onSubmit = (values) => {
+    value.onRegister(values.username, values.password, values.validatePassword);
+    setFailedRegister(true); 
+  }
+
+  const errorMessages = {
+    username: {
+      required: "username is required",
+    },
+    password: {
+      required: "password is required",
+      validate: "the two passwords don't match",
+      pattern: "please create a stronger password"
+    }
+  };
 
   return (
     <>
@@ -27,7 +41,7 @@ export const Register = () => {
           borderRadius: 2,
           width: '30%',
         }}>
-        { (value.token == null && error)?
+        { (value.token == null && failedRegister)?
           <Grid item xs={12}>
             <Typography
               style={{
@@ -40,62 +54,107 @@ export const Register = () => {
           : null
         }
         <Grid item xs={12}>
-          <TextField
-            type="text"
+          <Controller
+            control={control}
             name="username"
-            label="username"
-            color="secondary"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            sx={{
-              width: '95%',
-              mb: '1%',
-              mt: '2%'
+            defaultValue=""
+            rules={{
+              required: true,
             }}
-            InputProps={{ inputProps: { style: { color: '#000000' }}}}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                type="text"
+                fullWidth
+                label="username"
+                error={error !== undefined}
+                color="secondary"
+                sx={{
+                  width: '95%',
+                  mb: '1%',
+                  mt: '2%'
+                }}
+                helperText={error ? errorMessages.username[error.type] : ""}
+                InputProps={{ inputProps: { style: { color: '#000000' }}}}
+              />
+            )}
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            type="text"
+          <Controller
+            control={control}
             name="password"
-            label="password"
-            color="secondary"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            sx={{
-              width: '95%',
-              mb: '1%'
+            defaultValue=""
+            rules={{
+              required: true,
+              validate: () => getValues("password") === getValues("validatePassword"),
+              // password rules:
+              // - be at least 8 characters
+              // - contain at least one upper case letter
+              // - contain at least one lower case letter
+              // - contain at least one decimal digit
+              pattern: /^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=[^0-9]*[0-9]).{8,}$/
             }}
-            InputProps={{ inputProps: { style: { color: '#000000' }}}}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                type="password"
+                fullWidth
+                label="password"
+                error={error !== undefined}
+                color="secondary"
+                sx={{
+                  width: '95%',
+                  mb: '1%',
+                  mt: '2%'
+                }}
+                helperText={error ? errorMessages.password[error.type] : ""}
+                InputProps={{ inputProps: { style: { color: '#000000' }}}}
+              />
+            )}
           />
         </Grid>
         <Grid item xs={12}>
-          <TextField
-            type="text"
+          <Controller
+            control={control}
             name="validatePassword"
-            label="validate password"
-            color="secondary"
-            value={validatePassword}
-            onChange={(e) => setValidatePassword(e.target.value)}
-            sx={{
-              width: '95%',
-              mb: '1%'
+            defaultValue=""
+            rules={{
+              required: true,
+              validate: () => getValues("password") === getValues("validatePassword"),
+              pattern: /^(?=[^A-Z]*[A-Z])(?=[^a-z]*[a-z])(?=[^0-9]*[0-9]).{8,}$/
             }}
-            InputProps={{ inputProps: { style: { color: '#000000' }}}}
+            render={({ field, fieldState: { error } }) => (
+              <TextField
+                {...field}
+                type="password"
+                fullWidth
+                label="validate password"
+                error={error !== undefined}
+                color="secondary"
+                sx={{
+                  width: '95%',
+                  mb: '1%',
+                  mt: '2%'
+                }}
+                helperText={error ? errorMessages.password[error.type] : ""}
+                InputProps={{ inputProps: { style: { color: '#000000' }}}}
+              />
+            )}
           />
         </Grid>
         <Grid item xs={12}>
           <Button
-            variant="contained"
             color="secondary"
-            onClick={() => {value.onRegister(username, password, validatePassword); setError(true)}}
+            onClick={handleSubmit(onSubmit)}
+            variant="contained"
             sx={{
               width: '35%',
               mb: '3%'
             }}
-            >
-            Register
+          >
+            {" "}
+            Register{" "}
           </Button>
         </Grid>
       </Grid>
