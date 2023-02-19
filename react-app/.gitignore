@@ -6,6 +6,8 @@ react-frontend/.pnp
 react-frontend/.pnp.js
 expressjs-backend/node_modules
 expressjs-backend/package-lock.json
+.cert/*
+*/.env
 
 # testing
 react-frontend/coverage
