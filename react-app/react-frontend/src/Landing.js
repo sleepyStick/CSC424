@@ -1,35 +1,60 @@
 import { React, useState, useEffect } from 'react';
-import { Grid, IconButton, List, ListItem, ListItemButton, ListItemText } from '@mui/material';
+import { Grid, IconButton, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
+import axios from "axios";
 import { useAuth } from "./context/AuthProvider";
+import { useCookies } from "react-cookie";
 
 export const Landing = () => {
   const { value } = useAuth();
   const [everyone, setEveryone] = useState([]);
+  const [cookie, setCookie, removeCookie] = useCookies();
 
   useEffect(() => {
-    // call an API and in the success or failure fill the data buy using setData function
-    // it could be like below
-    // ApiCall()
-    //   .then(response => setData(response))
-    //   .catch(err => setError(err))
-    setEveryone([
-      { fav: false, username: 'random' },
-      { fav: false, username: 'person' },
-      { fav: true, username: 'iwho' }
-    ])
-  }, []);
+    axios.post(
+      "https://localhost:8000/users/contacts", {username: cookie['username']})
+      .then(response => {
+        setEveryone(response.data);
+      })
+  }, [cookie]);
+
+  const addFav = async (name) => {
+    console.log(name);
+    let everyone_else = everyone.filter((item) => (item.username !== name));
+    let person = {fav: true, username: name};
+    setEveryone([...everyone_else, person]);
+    await axios.post(
+      "https://localhost:8000/users/addFav", {username: cookie['username'], add: name}) 
+  };
+
+
+  const removeFav = async (name) => {
+    console.log(name);
+    let everyone_else = everyone.filter((item) => (item.username !== name));
+    let person = {fav: false, username: name};
+    setEveryone([...everyone_else, person]);
+    await axios.post(
+      "https://localhost:8000/users/removeFav", {username: cookie['username'], add: name}) 
+
+  };
 
   return (
     <>
       <h2>Landing (Protected)</h2>
-      <div> Authenticated as {value.token}</div>
+      <div> Authenticated as {value.username}</div>
       <Grid
         container
         spacing={1}
         align = "center"
         justifyContent = "center">
         <Grid item xs={6}>
+          <Typography
+            style={{
+              color: 'white'
+            }}
+          >
+            Everyone
+          </Typography>
           <List
             sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
             aria-label="everyone"
@@ -42,12 +67,7 @@ export const Landing = () => {
               >
                 <IconButton
                   name={item.username}
-                  onClick={(e) => {
-                    console.log(e.currentTarget.name);
-                    let everyone_else = everyone.filter((item) => (item.username !== e.currentTarget.name));
-                    let person = {fav: true, username: e.currentTarget.name};
-                    setEveryone([...everyone_else, person]);
-                  }}
+                  onClick={(e) => { addFav(e.currentTarget.name) }}
                 >
                   <StarIcon />
                 </IconButton>
@@ -62,6 +82,13 @@ export const Landing = () => {
           </List>
         </Grid>
         <Grid item xs={6}>
+          <Typography
+            style={{
+              color: 'white'
+            }}
+          >
+            Favorites
+          </Typography>
           <List
             sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
             aria-label="favorites"
@@ -74,12 +101,7 @@ export const Landing = () => {
               >
                 <IconButton
                   name={item.username}
-                  onClick={(e) => {
-                    console.log(e.currentTarget.name);
-                    let everyone_else = everyone.filter((item) => (item.username !== e.currentTarget.name));
-                    let person = {fav: false, username: e.currentTarget.name};
-                    setEveryone([...everyone_else, person]);
-                  }}
+                  onClick={(e) => { removeFav(e.currentTarget.name) }}
                 sx={{ color: 'secondary.main' }}
                 >
                   <StarIcon />

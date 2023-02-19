@@ -14,8 +14,11 @@ export async function register(username, password) {
   //     },
   //     body: JSON.stringify({username, crypt}),
   //   });
+  // const agent = new https.Agent({  
+  //   rejectUnauthorized: false
+  // });
   const response = await axios.post(
-    "https://localhost:8000/account/register", {username, crypt})
+    "https://localhost:8000/account/register", { username, crypt})
   console.log(response);
   if (response.status === 200) {
     console.log(response);

@@ -15,7 +15,9 @@ app.get('/', (req, res) => {
 });
 
 const account = require('./src/account');
+const users = require('./src/users');
 app.use('/account', account);
+app.use('/users', users);
 
 // app.post('/account/login', async (req, res) => { 
 //   const username = req.body.username;

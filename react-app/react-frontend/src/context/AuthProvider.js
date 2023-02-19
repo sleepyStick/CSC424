@@ -20,6 +20,7 @@ export const AuthProvider = ({ children }) => {
       const success = await register(username, password);
       console.log("in handleRegister: " + success);
       if (success) {
+        setCookie("username", username);
         setCookie("token", success.token);
         navigate("/landing");
       }
@@ -29,15 +30,18 @@ export const AuthProvider = ({ children }) => {
   const handleLogin = async (username, password) => {
     const token = await fakeAuth(username, password);
     console.log(token);
+    setCookie("username", username);
     setCookie("token", token);
     navigate("/landing");
   };
 
   const handleLogout = () => {
+    removeCookie("username");
     removeCookie("token");
   };
 
-  const value = {
+  let value = {
+    username: cookie['username'],
     token: cookie['token'],
     onLogin: handleLogin,
     onLogout: handleLogout,

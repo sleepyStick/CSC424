@@ -24,12 +24,12 @@ router.post('/login', async(req, res) => {
         if (await argon2.verify(hashed, password, hashingConfig)) {
           const token = makeToken({ username });
           res.status(200).send({ token }).end();
-        } else {
-
+          return
         }
       } catch (err) {
         console.log(err);
         res.status(500).send('error').end();
+        return
       }
     }
     // username doesnt exist or wrong password
@@ -38,6 +38,7 @@ router.post('/login', async(req, res) => {
 })
 
 router.post('/register', async (req, res) => { 
+  console.log("in register");
   const username = req.body.username;
   const password = req.body.crypt;
   console.log(username);
@@ -53,14 +54,17 @@ router.post('/register', async (req, res) => {
         const newUser = new User({ username, hash, token });
         newUser.save()
         res.status(200).send({ token }).end();
+        return
       } else {
         console.log("username taken")
         res.status(409).send('Username is already taken.').end();
+        return
       }
     })
   } catch (err) {
     console.log(err);
     res.status(500).send('error').end();
+    return
   }
 });
 
